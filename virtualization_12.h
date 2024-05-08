@@ -46,3 +46,7 @@ void setAudioDevicesVZVirtualMachineConfiguration(void *config,
     void *audioDevices);
 
 void startVirtualMachineWindow(void *machine, double width, double height);
+
+void *newAuthenticationSecurityConfiguration(const char *password);
+void *newVNCServer(void *machine, int port, void *authenticationSecurityConfiguration, void *dispatchQueue);
+void *startVNCServer(void *vncServer);

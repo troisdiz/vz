@@ -88,6 +88,7 @@ type VirtualMachine struct {
 	supported bool
 
 	*pointer
+	openPointer   unsafe.Pointer
 	dispatchQueue unsafe.Pointer
 	machineState  *machineState
 
@@ -125,15 +126,17 @@ func NewVirtualMachine(config *VirtualMachineConfiguration) (*VirtualMachine, er
 	}
 
 	stateHandle := cgo.NewHandle(machineState)
+	vmPointer := C.newVZVirtualMachineWithDispatchQueue(
+		objc.Ptr(config),
+		dispatchQueue,
+		C.uintptr_t(stateHandle),
+	)
 	v := &VirtualMachine{
 		id: cs.String(),
 		pointer: objc.NewPointer(
-			C.newVZVirtualMachineWithDispatchQueue(
-				objc.Ptr(config),
-				dispatchQueue,
-				C.uintptr_t(stateHandle),
-			),
+			vmPointer,
 		),
+		openPointer:   vmPointer,
 		dispatchQueue: dispatchQueue,
 		machineState:  machineState,
 		config:        config,
@@ -356,4 +359,30 @@ func (v *VirtualMachine) StartGraphicApplication(width, height float64) error {
 	}
 	C.startVirtualMachineWindow(objc.Ptr(v), C.double(width), C.double(height))
 	return nil
+}
+
+type VNCAuthenticationSecurityConfiguration struct {
+	pointer unsafe.Pointer
+}
+
+func NewVNCAuthenticationSecurityConfiguration(password string) *VNCAuthenticationSecurityConfiguration {
+	return &VNCAuthenticationSecurityConfiguration{
+		C.newAuthenticationSecurityConfiguration(charWithGoString(password).CString()),
+	}
+}
+
+type VNCServer struct {
+	pointer unsafe.Pointer
+}
+
+func (vncServer *VNCServer) Start() {
+	C.startVNCServer(vncServer.pointer)
+}
+
+func NewVNCServer(v *VirtualMachine, port int, authSecurityConfiguration *VNCAuthenticationSecurityConfiguration) *VNCServer {
+
+	vncServer := &VNCServer{
+		C.newVNCServer(v.openPointer, 0, authSecurityConfiguration.pointer, v.dispatchQueue),
+	}
+	return vncServer
 }
