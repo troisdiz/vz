@@ -397,11 +397,23 @@ void DumpObjcMethods(Class clz) {
 void *newAuthenticationSecurityConfiguration(const char *password)
 {
     if (@available(macOS 12, *)) {
-        NSLog(@"newAuthenticationSecurityConfiguration");
+        //NSLog(@"newAuthenticationSecurityConfiguration");
         Class VZVNCAuthenticationSecurityConfiguration = NSClassFromString(@"_VZVNCAuthenticationSecurityConfiguration");
-        NSLog(@"Load class OK");
-        NSObject *secConf = [[VZVNCAuthenticationSecurityConfiguration alloc] initWithPassword:[NSString stringWithUTF8String:password]];
-        NSLog(@"Alloc _VZVNCAuthenticationSecurityConfiguration ok");
+        //NSLog(@"newAuthenticationSecurityConfiguration Load class OK");
+        NSObject *secConf = [VZVNCAuthenticationSecurityConfiguration alloc];
+        //NSLog(@"newAuthenticationSecurityConfiguration alloc OK");
+        SEL selector = @selector(initWithPassword:);
+        //NSLog(@"newAuthenticationSecurityConfiguration selector OK");
+        NSMethodSignature *signature = [[secConf class] instanceMethodSignatureForSelector:selector];
+        //NSLog(@"newAuthenticationSecurityConfiguration signature OK");
+        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
+        //NSLog(@"newAuthenticationSecurityConfiguration invocation creation OK");
+        invocation.target = secConf;
+        invocation.selector = selector;
+        NSString *nsPassword = [NSString stringWithUTF8String:password];
+        [invocation setArgument:&nsPassword atIndex:2];
+        [invocation invoke];
+        //NSLog(@"newAuthenticationSecurityConfiguration Invocation done");
         return secConf;
     }
     RAISE_UNSUPPORTED_MACOS_EXCEPTION();
