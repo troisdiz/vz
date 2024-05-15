@@ -422,29 +422,42 @@ void *newAuthenticationSecurityConfiguration(const char *password)
 void *newVNCServer(void *machine, int port, void *authenticationSecurityConfiguration, void *dispatchQueue)
 {
     if (@available(macOS 12, *)) {
-        NSLog(@"newVNCServer START");
+        //NSLog(@"newVNCServer START");
         Class VZVNCServer = NSClassFromString(@"_VZVNCServer");
-        NSLog(@"newVNCServer Load class _VZVNCServer OK");
-        DumpObjcMethods(VZVNCServer);
-        NSLog(@"newVNCServer: Before vncServer creation with port %d", port);
-        NSObject *vncServer = [[VZVNCServer alloc] initWithPort:port queue:dispatchQueue securityConfiguration:authenticationSecurityConfiguration];
-        NSLog(@"newVNCServer After vncServer creation");
-        // initWithPort:queue:securityConfiguration
-        SEL selector = @selector(setVirtualMachine:);
-        NSLog(@"Alloc Selector created ok");
-        NSMethodSignature *signature = [[vncServer class] instanceMethodSignatureForSelector:selector];
-        NSLog(@"After signature compute");
-        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
-        NSLog(@"After invocation build");
+        //NSLog(@"newVNCServer Load class _VZVNCServer OK");
+        //DumpObjcMethods(VZVNCServer);
+        //NSLog(@"newVNCServer: Before vncServer creation with port %d", port);
+        //NSObject *vncServer = [[VZVNCServer alloc] initWithPort:port queue:dispatchQueue securityConfiguration:authenticationSecurityConfiguration];
+        NSObject *vncServer = [VZVNCServer alloc];
+        //NSLog(@"newVNCServer After vncServer allocation");
 
+        SEL selector = @selector(initWithPort:queue:securityConfiguration:);
+        NSMethodSignature *signature = [[vncServer class] instanceMethodSignatureForSelector:selector];
+        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
         invocation.target = vncServer;
-        NSLog(@"After target set to vncServer");
         invocation.selector = selector;
-        NSLog(@"After selector set");
-        [invocation setArgument:&machine atIndex:2];
-        NSLog(@"After setArgument machine ...");
+        [invocation setArgument:&port atIndex:2];
+        [invocation setArgument:&dispatchQueue atIndex:3];
+        [invocation setArgument:&authenticationSecurityConfiguration atIndex:4];
         [invocation invoke];
-        NSLog(@"newVNCServer END");
+        //NSLog(@"newVNCServer After vncServer creation");
+
+
+        SEL selector2 = @selector(setVirtualMachine:);
+        //NSLog(@"Alloc Selector created ok");
+        NSMethodSignature *signature2 = [[vncServer class] instanceMethodSignatureForSelector:selector2];
+        //NSLog(@"After signature compute");
+        NSInvocation *invocation2 = [NSInvocation invocationWithMethodSignature:signature2];
+        //NSLog(@"After invocation build");
+
+        invocation2.target = vncServer;
+        //NSLog(@"After target set to vncServer");
+        invocation2.selector = selector2;
+        //NSLog(@"After selector set");
+        [invocation2 setArgument:&machine atIndex:2];
+        //NSLog(@"After setArgument machine ...");
+        [invocation2 invoke];
+        //NSLog(@"newVNCServer END");
         return vncServer;
     }
     RAISE_UNSUPPORTED_MACOS_EXCEPTION();
@@ -452,26 +465,26 @@ void *newVNCServer(void *machine, int port, void *authenticationSecurityConfigur
 
 void *startVNCServer(void *vncServer) {
     if (@available(macOS 12, *)) {
-        NSLog(@"startVNCServer START");
+        //NSLog(@"startVNCServer START");
         Class VZVNCServer = NSClassFromString(@"_VZVNCServer");
-        NSLog(@"startVNCServerLoad class _VZVNCServer OK");
+        //NSLog(@"startVNCServerLoad class _VZVNCServer OK");
 
         SEL selector = @selector(start);
-        NSLog(@"startVNCServer Alloc Selector created ok");
+        //NSLog(@"startVNCServer Alloc Selector created ok");
         NSMethodSignature *signature = [[vncServer class] instanceMethodSignatureForSelector:selector];
-        NSLog(@"startVNCServer After signature compute");
+        //NSLog(@"startVNCServer After signature compute");
         NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
-        NSLog(@"startVNCServer After invocation build");
+        //NSLog(@"startVNCServer After invocation build");
 
         invocation.target = vncServer;
-        NSLog(@"startVNCServer After target set to vncServer");
+        //NSLog(@"startVNCServer After target set to vncServer");
         invocation.selector = selector;
-        NSLog(@"startVNCServer After selector set");
+        //NSLog(@"startVNCServer After selector set");
         [invocation invoke];
-        NSLog(@"startVNCServer after invoke");
+        //NSLog(@"startVNCServer after invoke");
 
-        DumpObjcMethods(VZVNCServer);
-        NSLog(@"startVNCServer END");
+        //DumpObjcMethods(VZVNCServer);
+        //NSLog(@"startVNCServer END");
         return nil;
     }
     RAISE_UNSUPPORTED_MACOS_EXCEPTION();
