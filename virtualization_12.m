@@ -400,9 +400,7 @@ void *newAuthenticationSecurityConfiguration(const char *password)
         NSLog(@"newAuthenticationSecurityConfiguration");
         Class VZVNCAuthenticationSecurityConfiguration = NSClassFromString(@"_VZVNCAuthenticationSecurityConfiguration");
         NSLog(@"Load class OK");
-        NSString *password = @"password";
-        NSLog(@"Password init");
-        NSObject *secConf = [[VZVNCAuthenticationSecurityConfiguration alloc] initWithPassword:password];
+        NSObject *secConf = [[VZVNCAuthenticationSecurityConfiguration alloc] initWithPassword:[NSString stringWithUTF8String:password]];
         NSLog(@"Alloc _VZVNCAuthenticationSecurityConfiguration ok");
         return secConf;
     }
@@ -416,8 +414,8 @@ void *newVNCServer(void *machine, int port, void *authenticationSecurityConfigur
         Class VZVNCServer = NSClassFromString(@"_VZVNCServer");
         NSLog(@"newVNCServer Load class _VZVNCServer OK");
         DumpObjcMethods(VZVNCServer);
-        NSLog(@"newVNCServer: Before vncServer creation");
-        NSObject *vncServer = [[VZVNCServer alloc] initWithPort:5900 queue:dispatchQueue securityConfiguration:authenticationSecurityConfiguration];
+        NSLog(@"newVNCServer: Before vncServer creation with port %d", port);
+        NSObject *vncServer = [[VZVNCServer alloc] initWithPort:port queue:dispatchQueue securityConfiguration:authenticationSecurityConfiguration];
         NSLog(@"newVNCServer After vncServer creation");
         // initWithPort:queue:securityConfiguration
         SEL selector = @selector(setVirtualMachine:);

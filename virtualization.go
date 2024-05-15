@@ -382,7 +382,7 @@ func (vncServer *VNCServer) Start() {
 func NewVNCServer(v *VirtualMachine, port int, authSecurityConfiguration *VNCAuthenticationSecurityConfiguration) *VNCServer {
 
 	vncServer := &VNCServer{
-		C.newVNCServer(v.openPointer, 0, authSecurityConfiguration.pointer, v.dispatchQueue),
+		C.newVNCServer(v.openPointer, C.int(port), authSecurityConfiguration.pointer, v.dispatchQueue),
 	}
 	return vncServer
 }
